@@ -44,6 +44,7 @@ pub struct Theme {
     /// theme renderer
     pub renderer: Tera,
     main_css: Vec<u8>,
+    main_js: Vec<u8>,
     atom: Vec<u8>,
     base: Vec<u8>,
     index: Vec<u8>,
@@ -69,6 +70,7 @@ impl Theme {
                 return Err(Error::ThemeNotFound(name.into()));
             }
             theme.main_css.extend_from_slice(SIMPLE_MAIN_CSS);
+            theme.main_js.extend_from_slice(SIMPLE_MAIN_JS);
             theme.atom.extend_from_slice(SIMPLE_ATOM);
             theme.base.extend_from_slice(SIMPLE_BASE);
             theme.index.extend_from_slice(SIMPLE_INDEX);
@@ -80,6 +82,7 @@ impl Theme {
         }
 
         try_read_file!(src_dir, "static/main.css", &mut theme.main_css);
+        try_read_file!(src_dir, "static/bundle.js", &mut theme.main_js);
         read_file(&src_dir.join("templates/atom.tpl"), &mut theme.atom)?;
         read_file(&src_dir.join("templates/base.tpl"), &mut theme.base)?;
         read_file(&src_dir.join("templates/index.tpl"), &mut theme.index)?;
@@ -110,6 +113,7 @@ impl Theme {
         }
         debug!("init theme({}) ...", name);
         write_file(&dest_dir.join("static/main.css"), &self.main_css)?;
+        write_file(&dest_dir.join("static/bundle.js"), &self.main_js)?;
         write_file(&dest_dir.join("templates/atom.tpl"), &self.atom)?;
         write_file(&dest_dir.join("templates/base.tpl"), &self.base)?;
         write_file(&dest_dir.join("templates/index.tpl"), &self.index)?;
@@ -125,11 +129,13 @@ impl Theme {
         let src_dir = self.root.join(&self.name);
         let dest_dir = root.as_ref();
         try_write_file!(src_dir, dest_dir, "static/main.css", &self.main_css);
+        try_write_file!(src_dir, dest_dir, "static/bundle.js", &self.main_js);
         Ok(())
     }
 }
 
 static SIMPLE_MAIN_CSS: &[u8] = include_bytes!("themes/simple/static/main.css");
+static SIMPLE_MAIN_JS: &[u8] = include_bytes!("themes/simple/static/bundle.js");
 static SIMPLE_ATOM: &[u8] = include_bytes!("themes/simple/templates/atom.tpl");
 static SIMPLE_BASE: &[u8] = include_bytes!("themes/simple/templates/base.tpl");
 static SIMPLE_INDEX: &[u8] = include_bytes!("themes/simple/templates/index.tpl");

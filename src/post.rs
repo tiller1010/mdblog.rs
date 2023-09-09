@@ -41,6 +41,8 @@ pub struct Post {
     root: PathBuf,
     /// post path from relative root directory
     pub path: PathBuf,
+    /// formatted post path for Windows support
+    pub formatted_path: String,
     /// the post title
     pub title: String,
     /// the post url
@@ -68,9 +70,13 @@ impl Post {
         };
         let url = Path::new("/").join(path).with_extension("html");
 
+        // Replace backslashes with slashes for Windows
+        let formatted_path = url.to_string_lossy().replace("\\", "/");
+
         Ok(Post {
             root: root.to_owned(),
             path: path.to_owned(),
+            formatted_path: formatted_path.to_owned(),
             title: title.to_owned(),
             url,
             headers,
