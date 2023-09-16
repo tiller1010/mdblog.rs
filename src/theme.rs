@@ -45,6 +45,10 @@ pub struct Theme {
     pub renderer: Tera,
     main_css: Vec<u8>,
     main_js: Vec<u8>,
+
+    main_wasm: Vec<u8>,
+    main_wasm_bg: Vec<u8>,
+
     atom: Vec<u8>,
     base: Vec<u8>,
     index: Vec<u8>,
@@ -71,6 +75,10 @@ impl Theme {
             }
             theme.main_css.extend_from_slice(SIMPLE_MAIN_CSS);
             theme.main_js.extend_from_slice(SIMPLE_MAIN_JS);
+
+            theme.main_wasm.extend_from_slice(SIMPLE_MAIN_WASM);
+            theme.main_wasm_bg.extend_from_slice(SIMPLE_MAIN_WASM_BG);
+
             theme.atom.extend_from_slice(SIMPLE_ATOM);
             theme.base.extend_from_slice(SIMPLE_BASE);
             theme.index.extend_from_slice(SIMPLE_INDEX);
@@ -83,6 +91,10 @@ impl Theme {
 
         try_read_file!(src_dir, "static/main.css", &mut theme.main_css);
         try_read_file!(src_dir, "static/bundle.js", &mut theme.main_js);
+
+        try_read_file!(src_dir, "static/pkg/blog_wasm_bg.wasm", &mut theme.main_wasm);
+        try_read_file!(src_dir, "static/pkg/blog_wasm_bg.js", &mut theme.main_wasm_bg);
+
         read_file(&src_dir.join("templates/atom.tpl"), &mut theme.atom)?;
         read_file(&src_dir.join("templates/base.tpl"), &mut theme.base)?;
         read_file(&src_dir.join("templates/index.tpl"), &mut theme.index)?;
@@ -114,6 +126,10 @@ impl Theme {
         debug!("init theme({}) ...", name);
         write_file(&dest_dir.join("static/main.css"), &self.main_css)?;
         write_file(&dest_dir.join("static/bundle.js"), &self.main_js)?;
+
+        write_file(&dest_dir.join("static/pkg/blog_wasm_bg.wasm"), &self.main_wasm)?;
+        write_file(&dest_dir.join("static/pkg/blog_wasm_bg.js"), &self.main_wasm_bg)?;
+
         write_file(&dest_dir.join("templates/atom.tpl"), &self.atom)?;
         write_file(&dest_dir.join("templates/base.tpl"), &self.base)?;
         write_file(&dest_dir.join("templates/index.tpl"), &self.index)?;
@@ -130,15 +146,24 @@ impl Theme {
         let dest_dir = root.as_ref();
         try_write_file!(src_dir, dest_dir, "static/main.css", &self.main_css);
         try_write_file!(src_dir, dest_dir, "static/bundle.js", &self.main_js);
+
+        try_write_file!(src_dir, dest_dir, "static/pkg/blog_wasm_bg.wasm", &self.main_wasm);
+        try_write_file!(src_dir, dest_dir, "static/pkg/blog_wasm_bg.js", &self.main_wasm_bg);
+
         Ok(())
     }
 }
 
 static SIMPLE_MAIN_CSS: &[u8] = include_bytes!("themes/simple/static/main.css");
 static SIMPLE_MAIN_JS: &[u8] = include_bytes!("themes/simple/static/bundle.js");
+
+static SIMPLE_MAIN_WASM: &[u8] = include_bytes!("themes/simple/static/pkg/blog_wasm_bg.wasm");
+static SIMPLE_MAIN_WASM_BG: &[u8] = include_bytes!("themes/simple/static/pkg/blog_wasm_bg.js");
+
 static SIMPLE_ATOM: &[u8] = include_bytes!("themes/simple/templates/atom.tpl");
 static SIMPLE_BASE: &[u8] = include_bytes!("themes/simple/templates/base.tpl");
 static SIMPLE_INDEX: &[u8] = include_bytes!("themes/simple/templates/index.tpl");
 static SIMPLE_POST: &[u8] = include_bytes!("themes/simple/templates/post.tpl");
 static SIMPLE_TAG: &[u8] = include_bytes!("themes/simple/templates/tag.tpl");
 static SIMPLE_TAGS: &[u8] = include_bytes!("themes/simple/templates/tags.tpl");
+
