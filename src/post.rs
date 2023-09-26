@@ -91,7 +91,14 @@ impl Post {
         let mut content = String::new();
         fo.read_to_string(&mut content)?;
 
-        let v: Vec<&str> = content.splitn(2, "\n\n").collect();
+        // Get the line ending format
+        let mut line_ending = "\n\n";
+        if content.find("\r\n").is_some() {
+            line_ending = "\r\n";
+        }
+
+        let v: Vec<&str> = content.splitn(2, line_ending).collect();
+
         if v.len() != 2 {
             return Err(Error::PostOnlyOnePart(path.into()));
         }
