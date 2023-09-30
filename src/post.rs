@@ -61,13 +61,15 @@ impl Post {
         debug!("loading post: {}", path.display());
 
         let (headers, content) = Self::split_file(root, path)?;
-        let title = if headers.title.is_empty() {
+        let mut title = if headers.title.is_empty() {
             path.file_stem()
                 .and_then(|x| x.to_str())
                 .expect(&format!("post filename format error: {}", path.display()))
         } else {
             headers.title.as_ref()
         };
+        let title_no_underscore_binding = title.replace("_", " ");
+        title = &title_no_underscore_binding;
         let url = Path::new("/").join(path).with_extension("html");
 
         // Replace backslashes with slashes for Windows
