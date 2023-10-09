@@ -61,6 +61,7 @@ impl Post {
         debug!("loading post: {}", path.display());
 
         let (headers, content) = Self::split_file(root, path)?;
+
         let mut title = if headers.title.is_empty() {
             path.file_stem()
                 .and_then(|x| x.to_str())
@@ -68,8 +69,24 @@ impl Post {
         } else {
             headers.title.as_ref()
         };
+
         let title_no_underscore_binding = title.replace("_", " ");
         title = &title_no_underscore_binding;
+
+        // Capitalize the first letter of each word
+        let title_capitalized_binding = &title
+            .split_whitespace()
+            .map(|word| {
+                let mut chars = word.chars();
+                match chars.next() {
+                    None => String::new(),
+                    Some(c) => c.to_uppercase().chain(chars).collect(),
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" ");
+        title = title_capitalized_binding;
+
         let url = Path::new("/").join(path).with_extension("html");
 
         // Replace backslashes with slashes for Windows
